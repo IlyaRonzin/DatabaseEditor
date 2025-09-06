@@ -1,0 +1,77 @@
+﻿<!-- Views/Table/Edit.cshtml -->
+@model DatabaseEditor.Models.TableModel
+@{
+    ViewData["Title"] = "Edit Table";
+    var error = TempData["Error"] as string;
+}
+
+<div class="container">
+    <h2>Edit Table: @Model.Name</h2>
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="Name" />
+        <div class="form-group">
+            <label>Fields</label>
+            <div id="fields-container">
+                @for (int i = 0; i < Model.Fields.Count; i++)
+                {
+                    <div class="row mb-2">
+                        <div class="col">
+                            <input type="text" name="Fields[@i].Name" value="@Model.Fields[i].Name" class="form-control" required />
+                        </div>
+                        <div class="col">
+                            <select name="Fields[@i].Type" class="form-control" required>
+                                <option value="int" selected="@(Model.Fields[i].Type == "int" ? "selected" : null)">Integer</option>
+                                <option value="double" selected="@(Model.Fields[i].Type == "double" ? "selected" : null)">Double</option>
+                                <option value="text" selected="@(Model.Fields[i].Type == "text" ? "selected" : null)">Text</option>
+                                <option value="timestamp" selected="@(Model.Fields[i].Type == "timestamp" ? "selected" : null)">Date/Time</option>
+                            </select>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">Удалить</button>
+                        </div>
+                    </div>
+                }
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="addField()">Добавить поле</button>
+        </div>
+        <div class="form-group">
+            <label for="PrimaryKeyField">Primary Key</label>
+            <input type="text" class="form-control" asp-for="PrimaryKeyField" />
+        </div>
+        <button type="submit" class="btn btn-primary" onclick="return confirm('Editing will recreate the table and may cause data loss. Continue?');">Save Changes</button>
+        <a href="@Url.Action("Index")" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<script>
+    let fieldIndex = @Model.Fields.Count;
+
+    function addField() {
+        const container = document.getElementById('fields-container');
+        const fieldHtml = `
+                <div class="row mb-2">
+                    <div class="col">
+                            <input type="text" name="Fields[${fieldIndex}].Name" placeholder="Название поля" class="form-control" required />
+                    </div>
+                    <div class="col">
+                        <select name="Fields[${fieldIndex}].Type" class="form-control" required>
+                            <option value="int">Integer</option>
+                            <option value="double">Double</option>
+                            <option value="text">Текст</option>
+                            <option value="timestamp">Дата/Время</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">Удалить</button>
+                    </div>
+                </div>
+            `;
+        container.insertAdjacentHTML('beforeend', fieldHtml);
+        fieldIndex++;
+    }
+</script>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <script>alert('@error');</script>
+}

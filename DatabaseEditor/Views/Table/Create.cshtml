@@ -1,0 +1,61 @@
+﻿<!-- Views/Table/Create.cshtml -->
+@model DatabaseEditor.Models.TableModel
+@{
+    ViewData["Title"] = "Create Table";
+    var error = TempData["Error"] as string;
+}
+
+<div class="container">
+    <h2>Создать новую таблицу</h2>
+    <form asp-action="Create" method="post">
+        <div class="form-group">
+            <label for="Name">Название таблицы</label>
+            <input type="text" class="form-control" asp-for="Name" required />
+        </div>
+        <div class="form-group">
+            <label>Поля</label>
+            <div id="fields-container">
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="addField()">Добавить поле</button>
+        </div>
+        <div class="form-group">
+            <label for="PrimaryKeyField">Primary Key</label>
+            <input type="text" class="form-control" asp-for="PrimaryKeyField" />
+        </div>
+        <button type="submit" class="btn btn-primary">Создать</button>
+        <a href="@Url.Action("Index")" class="btn btn-secondary">Закрыть</a>
+    </form>
+</div>
+
+<script>
+    let fieldIndex = 0;
+
+    function addField() {
+        const container = document.getElementById('fields-container');
+        const fieldHtml = `
+                <div class="row mb-2">
+                    <div class="col">
+                        <input type="text" name="Fields[${fieldIndex}].Name" placeholder="Название поля" class="form-control" required />
+                    </div>
+                    <div class="col">
+                        <select name="Fields[${fieldIndex}].Type" class="form-control" required>
+                            <option value="int">Integer</option>
+                            <option value="double">Double</option>
+                            <option value="text">Текст</option>
+                            <option value="timestamp">Дата/Время</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">Удалить</button>
+                    </div>
+                </div>
+            `;
+        container.insertAdjacentHTML('beforeend', fieldHtml);
+        fieldIndex++;
+    }
+</script>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <script>alert('@error');</script>
+}
